@@ -1,0 +1,29 @@
+---
+- name: Deploy Employee Management System
+  hosts: azure_vps
+  # 1. Turn on gather_facts so Ansible knows the server's Home directory
+  gather_facts: yes
+
+  tasks:
+    - name: Ensure project directory exists
+      file:
+        path: "{{ ansible_env.HOME }}/Employee-management-System"
+        state: directory
+
+    - name: Synchronize project code to the Azure server
+      synchronize:
+        # 2. Use the absolute playbook directory to force contents-only copying
+        src: "{{ playbook_dir }}/../"  
+        dest: "{{ ansible_env.HOME }}/Employee-management-System/"
+        delete: yes
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=frontend/node_modules"
+          - "--exclude=backend/node_modules"
+          - "--exclude=terraform"
+          - "--exclude=ansible"
+
+    - name: Spin up the Docker containers
+      command: docker compose up --build -d
+      args:
+        chdir: "{{ ansible_env.HOME }}/Employee-management-System"

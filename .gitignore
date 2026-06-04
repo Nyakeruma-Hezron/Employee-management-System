@@ -2,3 +2,9 @@
 config.js
 jwtKey.js
 .env
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
