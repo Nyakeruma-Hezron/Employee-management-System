@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const Joi = require("joi");
+const bcrypt = require("bcryptjs"); // <--- 1. Import bcryptjs
 const { Employee } = require("../models/index");
 const { jwtKey } = require("../config/env");
 
@@ -24,18 +25,22 @@ router.post("/login", (req, res) => {
             if (err || document == null) {
               res.send("false");
             } else {
-              if (document.Password == req.body.password) {
-                let emp = {
-                  _id: document._id,
-                  Account: document.Account,
-                  FirstName: document.FirstName,
-                  LastName: document.LastName
-                };
-                var token = jwt.sign(emp, jwtKey);
-                res.send(token);
-              } else {
-                res.sendStatus(400);
-              }
+              // 2. Use bcrypt to securely compare the passwords
+              bcrypt.compare(req.body.password, document.Password, (bcryptErr, isMatch) => {
+                if (isMatch) {
+                  let emp = {
+                    _id: document._id,
+                    Account: document.Account,
+                    FirstName: document.FirstName,
+                    LastName: document.LastName
+                  };
+                  var token = jwt.sign(emp, jwtKey);
+                  res.send(token);
+                } else {
+                  // If password fails, send the 400 (or ideally a 401 Unauthorized)
+                  res.sendStatus(400); 
+                }
+              });
             }
           }
         );

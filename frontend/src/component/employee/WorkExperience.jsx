@@ -57,7 +57,7 @@ class WorkExperience extends Component {
       ToDate: event.target[3].value,
     };
     axios
-      .post("http://localhost:4000/api/work-experience/" + this.props.data["_id"], body, {
+      .post("/api/work-experience/" + this.props.data["_id"], body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -105,7 +105,7 @@ class WorkExperience extends Component {
     console.log("update", body);
     axios
       .put(
-        "http://localhost:4000/api/work-experience/" + info["_id"],
+        "/api/work-experience/" + info["_id"],
         body, {
         headers: {
           authorization: localStorage.getItem("token") || ""

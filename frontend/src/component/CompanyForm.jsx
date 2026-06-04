@@ -16,7 +16,7 @@ class CompanyForm extends Component {
 
   loadCountryInfo = () => {
     axios
-      .get("http://localhost:4000/api/country", {
+      .get("/api/country", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -30,7 +30,7 @@ class CompanyForm extends Component {
   };
   loadStateInfo = () => {
     axios
-      .get("http://localhost:4000/api/state", {
+      .get("/api/state", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -44,7 +44,7 @@ class CompanyForm extends Component {
   };
   loadCityInfo = () => {
     axios
-      .get("http://localhost:4000/api/city", {
+      .get("/api/city", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }

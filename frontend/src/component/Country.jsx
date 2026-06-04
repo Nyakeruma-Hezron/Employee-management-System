@@ -72,7 +72,7 @@ class Country extends Component {
     //  let body= "CompanyID=" + event.target[0].value + "&Country=" + event.target[1].value;
     //  let body= "debru";
     axios
-      .post("http://localhost:4000/api/country", body, {
+      .post("/api/country", body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -120,7 +120,7 @@ class Country extends Component {
     };
     console.log("update", body);
     axios
-      .put("http://localhost:4000/api/country/" + info["_id"], body, {
+      .put("/api/country/" + info["_id"], body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }

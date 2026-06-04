@@ -56,7 +56,7 @@ class Education extends Component {
       PassingOfYear: event.target[3].value,
     };
     axios
-      .post("http://localhost:4000/api/education/" + this.props.data["_id"], body, {
+      .post("/api/education/" + this.props.data["_id"], body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -104,7 +104,7 @@ class Education extends Component {
     console.log("update", body);
     axios
       .put(
-        "http://localhost:4000/api/education/" + info["_id"],
+        "/api/education/" + info["_id"],
         body, {
         headers: {
           authorization: localStorage.getItem("token") || ""

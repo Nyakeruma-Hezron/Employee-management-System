@@ -56,7 +56,7 @@ class Company extends Component {
       CINNo: event.target[13].value,
     };
     axios
-      .post("http://localhost:4000/api/company", body, {
+      .post("/api/company", body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -110,7 +110,7 @@ class Company extends Component {
     console.log("update", body);
     axios
       .put(
-        "http://localhost:4000/api/company/" + info["_id"],
+        "/api/company/" + info["_id"],
         body, {
         headers: {
           authorization: localStorage.getItem("token") || ""

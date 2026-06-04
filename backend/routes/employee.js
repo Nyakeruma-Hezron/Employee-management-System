@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Joi = require("joi");
+const bcrypt = require("bcryptjs");
 const { verifyHR, verifyEmployee, verifyHREmployee } = require("../middleware/auth");
 const { 
   Employee, EmployeeValidation, EmployeeValidationUpdate, EmployeePersonalInfoValidation,
@@ -22,12 +23,21 @@ router.get("/employee", verifyHR, (req, res) => {
 });
 
 router.post("/employee", verifyHR, (req, res) => {
+  // 1. THE TERMINATE DATE FIX: Sanitize empty strings before Joi sees them
+  if (req.body.TerminateDate === "") {
+    delete req.body.TerminateDate;
+  }
+
   Joi.validate(req.body, EmployeeValidation, (err, result) => {
-    if (err) res.status(400).send(err.details[0].message);
-    else {
+    if (err) {
+      res.status(400).send(err.details[0].message);
+    } else {
+      // 2. THE SECURITY FIX: Hash the password before saving to the database
+      const hashedPassword = bcrypt.hashSync(req.body.Password, 10);
+
       let newEmployee = {
         Email: req.body.Email,
-        Password: req.body.Password,
+        Password: hashedPassword, // <--- Now securely hashed!
         role: req.body.RoleID,
         Account: req.body.Account,
         Gender: req.body.Gender,
@@ -42,6 +52,7 @@ router.post("/employee", verifyHR, (req, res) => {
         DateOfJoining: req.body.DateOfJoining,
         TerminateDate: req.body.TerminateDate
       };
+      
       Employee.create(newEmployee, function (err, employee) {
         if (err) res.send("error");
         else res.send(employee);
@@ -51,9 +62,15 @@ router.post("/employee", verifyHR, (req, res) => {
 });
 
 router.put("/employee/:id", verifyHR, (req, res) => {
+  // Apply the same Terminate Date fix to the update route as well!
+  if (req.body.TerminateDate === "") {
+    delete req.body.TerminateDate;
+  }
+
   Joi.validate(req.body, EmployeeValidationUpdate, (err, result) => {
-    if (err) res.status(400).send(err.details[0].message);
-    else {
+    if (err) {
+      res.status(400).send(err.details[0].message);
+    } else {
       let newEmployee = {
         Email: req.body.Email,
         Account: req.body.Account,
@@ -70,6 +87,7 @@ router.put("/employee/:id", verifyHR, (req, res) => {
         DateOfJoining: req.body.DateOfJoining,
         TerminateDate: req.body.TerminateDate
       };
+      
       Employee.findByIdAndUpdate(req.params.id, newEmployee, function (err, employee) {
         if (err) res.send("error");
         else res.send(newEmployee);
@@ -499,5 +517,4 @@ router.delete("/leave-application-hr/:id/:id2", verifyHR, (req, res) => {
     }
   });
 });
-
 module.exports = router;

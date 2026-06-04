@@ -48,7 +48,7 @@ class City extends Component {
       CityName: event.target[2].value
     };
     axios
-      .post("http://localhost:4000/api/city", body, {
+      .post("/api/city", body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -94,7 +94,7 @@ class City extends Component {
     };
 
     axios
-      .put("http://localhost:4000/api/city/" + info["_id"], body, {
+      .put("/api/city/" + info["_id"], body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }

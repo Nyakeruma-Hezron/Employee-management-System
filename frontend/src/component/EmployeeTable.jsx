@@ -186,7 +186,7 @@ class AdminEmployeeTable extends Component {
 
   loadEmployeeData = () => {
     axios
-      .get("http://localhost:4000/api/employee", {
+      .get("/api/employee", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -203,17 +203,27 @@ class AdminEmployeeTable extends Component {
             Email: data["Email"],
             Password: data["Password"],
             Account: data["Account"] == 1 ? "Admin" : (data["Account"] == 2 ? "HR" : (data["Account"] == 3 ? "Employee" : "")),
-            RoleName: data["role"][0]["RoleName"],
+            
+            // 1. FIXED ROLE
+            RoleName: data["role"][0]?.RoleName || "N/A",
+            
             FirstName: data["FirstName"],
             MiddleName: data["MiddleName"],
             LastName: data["LastName"],
             DOB: data["DOB"].slice(0, 10),
             ContactNo: data["ContactNo"],
             EmployeeCode: data["EmployeeCode"],
-            DepartmentName: data["department"][0]["DepartmentName"],
-            PositionName: data["position"][0]["PositionName"],
+            
+            // 2. FIXED DEPARTMENT
+            DepartmentName: data["department"][0]?.DepartmentName || "N/A",
+            
+            // 3. FIXED POSITION
+            PositionName: data["position"][0]?.PositionName || "N/A",
+            
             DateOfJoining: data["DateOfJoining"].slice(0, 10)
           };
+          
+          // ... rest of your code ...
 
           this.rowDataT.push(temp);
         });
@@ -229,7 +239,7 @@ class AdminEmployeeTable extends Component {
     if (window.confirm("Are you sure to delete this record? ") == true) {
       window.alert("You are not allowed to perform this operation");
       // axios
-      //   .delete("http://localhost:4000/api/employee/" + e, {
+      //   .delete("/api/employee/" + e, {
       //     headers: {
       //       authorization: localStorage.getItem("token") || ""
       //     }

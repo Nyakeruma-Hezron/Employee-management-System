@@ -11,7 +11,7 @@ class DepartmentForm extends Component {
   companyData = [];
   loadCompanyInfo = () => {
     axios
-      .get("http://localhost:4000/api/company", {
+      .get("/api/company", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }

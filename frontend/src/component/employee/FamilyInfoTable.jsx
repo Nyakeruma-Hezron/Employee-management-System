@@ -95,7 +95,7 @@ class FamilyInfoTable extends Component {
 
   loadFamilyInfoData = () => {
     axios
-      .get("http://localhost:4000/api/family-info/" + this.props.data["_id"], {
+      .get("/api/family-info/" + this.props.data["_id"], {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -130,7 +130,7 @@ class FamilyInfoTable extends Component {
     console.log(e1, e2);
     if (window.confirm("Are you sure to delete this record? ") == true) {
       axios
-        .delete("http://localhost:4000/api/family-info/" + e1 + "/" + e2, {
+        .delete("/api/family-info/" + e1 + "/" + e2, {
           headers: {
             authorization: localStorage.getItem("token") || ""
           }

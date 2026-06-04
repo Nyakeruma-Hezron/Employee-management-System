@@ -11,7 +11,7 @@ class StateForm extends Component {
   countryData = [];
   loadCountryInfo = () => {
     axios
-      .get("http://localhost:4000/api/country", {
+      .get("/api/country", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }

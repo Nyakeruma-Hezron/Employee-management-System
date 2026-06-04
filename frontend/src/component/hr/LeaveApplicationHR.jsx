@@ -62,7 +62,7 @@ class LeaveApplicationHR extends Component {
       Status: event.target[4].value,
     };
     axios
-      .post("http://localhost:4000/api/leave-application-hr/" + this.props.data["_id"], body, {
+      .post("/api/leave-application-hr/" + this.props.data["_id"], body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -107,7 +107,7 @@ class LeaveApplicationHR extends Component {
     console.log("update", body);
     axios
       .put(
-        "http://localhost:4000/api/leave-application-hr/" + info["_id"],
+        "/api/leave-application-hr/" + info["_id"],
         body, {
         headers: {
           authorization: localStorage.getItem("token") || ""

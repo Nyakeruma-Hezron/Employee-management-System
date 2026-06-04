@@ -118,7 +118,7 @@ class AdminProjectBidTable extends Component {
 
   loadProjectBidData = () => {
     axios
-      .get("http://localhost:4000/api/admin/project-bid", {
+      .get("/api/admin/project-bid", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -155,7 +155,7 @@ class AdminProjectBidTable extends Component {
     console.log(e);
     if (window.confirm("Are you sure to delete this record? ") == true) {
       axios
-        .delete("http://localhost:4000/api/admin/project-bid/" + e, {
+        .delete("/api/admin/project-bid/" + e, {
           headers: {
             authorization: localStorage.getItem("token") || ""
           }

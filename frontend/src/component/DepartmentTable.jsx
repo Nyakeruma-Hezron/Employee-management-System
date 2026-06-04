@@ -77,7 +77,7 @@ class DepartmentTable extends Component {
 
   loadDepartmentData = () => {
     axios
-      .get("http://localhost:4000/api/department", {
+      .get("/api/department", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -111,7 +111,7 @@ class DepartmentTable extends Component {
     console.log(e);
     if (window.confirm("Are you sure to delete this record ? ") == true) {
       axios
-        .delete("http://localhost:4000/api/department/" + e, {
+        .delete("/api/department/" + e, {
           headers: {
             authorization: localStorage.getItem("token") || ""
           }

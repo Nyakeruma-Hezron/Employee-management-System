@@ -73,7 +73,7 @@ class Department extends Component {
     //  let body= "CompanyID=" + event.target[0].value + "&Department=" + event.target[1].value;
     //  let body= "debru";
     axios
-      .post("http://localhost:4000/api/department", body, {
+      .post("/api/department", body, {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -123,7 +123,7 @@ class Department extends Component {
     console.log("update", body);
     axios
       .put(
-        "http://localhost:4000/api/department/" + info["_id"],
+        "/api/department/" + info["_id"],
         body, {
         headers: {
           authorization: localStorage.getItem("token") || ""

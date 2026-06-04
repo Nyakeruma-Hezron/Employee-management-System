@@ -131,7 +131,7 @@ class PersonalInfoTable extends Component {
   rowDataT = [];
   loadPersonalInfoData = () => {
     axios
-      .get("http://localhost:4000/api/personal-info/" + this.props.data["_id"], {
+      .get("/api/personal-info/" + this.props.data["_id"], {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -175,7 +175,7 @@ class PersonalInfoTable extends Component {
     console.log(e);
     if (window.confirm("Are you sure to delete this record? ") == true) {
       axios
-        .delete("http://localhost:4000/api/personalInfo/" + e, {
+        .delete("/api/personalInfo/" + e, {
           headers: {
             authorization: localStorage.getItem("token") || ""
           }

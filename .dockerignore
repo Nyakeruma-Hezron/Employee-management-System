@@ -1,0 +1,9 @@
+frontend/node_modules
+frontend/build
+backend/node_modules
+npm-debug.log
+Dockerfile
+docker-compose.override.yml
+.git
+.gitignore
+.env

@@ -25,9 +25,9 @@ class App extends Component {
     data: {},
     loading: false,
     pass: true,
-    isLogin: false,
-    firstTimeAlert: true,
+    isLogin: false
   };
+
   componentDidMount() {
     this.setState({
       data: {
@@ -36,33 +36,9 @@ class App extends Component {
         Name: localStorage.getItem("Name") || ""
       },
       isLogin: localStorage.getItem("isLogin") == "true"
-
-    }, () => {
-      // temporary : for user to see user id and pass of all accounts to explore all features of app
-      this.alertFirstTime()
     });
-
   }
-  alertFirstTime() {
-    if (this.state.firstTimeAlert && !this.state.isLogin) {
-      setTimeout(function () {
-        window.alert(
-          `To explore the feature of this application here is the temporary id and pass for all account
-      Admin:
-          id:admin@gmail.com
-          pass:admin
-      Hr:
-          id:hr@gmail.com
-          pass:hr
-      Employee:
-          id:emp@gmail.com
-          pass:emp
-      `)
-      }, 500);
 
-      this.setState({ firstTimeAlert: false });
-    }
-  }
   render() {
     return (
       // <div>{this.state.isLogin ? (
@@ -194,7 +170,7 @@ class App extends Component {
     // {Email: id, Password: pass}
 
     axios
-      .post("http://localhost:4000/api/login", bodyLogin)
+      .post("/api/login", bodyLogin)
       .then(res => {
         // console.log(decodedData.Account);
         console.log(jwt.decode(res.data));

@@ -77,7 +77,7 @@ class PositionTable extends Component {
 
   loadPositionData = () => {
     axios
-      .get("http://localhost:4000/api/position", {
+      .get("/api/position", {
         headers: {
           authorization: localStorage.getItem("token") || ""
         }
@@ -110,7 +110,7 @@ class PositionTable extends Component {
     console.log(e);
     if (window.confirm("Are you sure to delete this record ? ") == true) {
       axios
-        .delete("http://localhost:4000/api/position/" + e, {
+        .delete("/api/position/" + e, {
           headers: {
             authorization: localStorage.getItem("token") || ""
           }
