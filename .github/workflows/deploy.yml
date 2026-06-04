@@ -1,0 +1,40 @@
+name: Production Ansible Deployment
+
+# 1. THE TRIGGER: This runs every time you merge code into the main branch
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Execute Ansible Playbook
+    runs-on: ubuntu-latest
+
+    steps:
+      # 2. Grab the latest code from the repository
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 3. Install Ansible on the temporary GitHub cloud runner
+      - name: Install Ansible
+        run: |
+          sudo apt update
+          sudo apt install -y ansible
+
+      # 4. Securely inject your SSH key so Ansible can log into Azure
+      - name: Set up SSH Key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.AZURE_SSH_KEY }}
+
+      # 5. Prevent SSH fingerprint prompts from freezing the pipeline
+      - name: Add Azure VPS to Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
+
+      # 6. Fire the playbook! 
+      - name: Run Ansible Playbook
+        working-directory: ./ansible
+        run: |
+          ansible-playbook -i hosts.ini deploy.yml -u hezron
