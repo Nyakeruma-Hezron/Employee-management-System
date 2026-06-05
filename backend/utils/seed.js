@@ -52,7 +52,7 @@ const seedDatabase = async () => {
     }
 
   } catch (error) {
-    console.error("❌ Failed to seed database:", error);
+    console.error("Failed to seed database:", error);
   }
 };
 
