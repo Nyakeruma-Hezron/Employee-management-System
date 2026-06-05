@@ -24,9 +24,9 @@ const seedDatabase = async () => {
         Gender: "N/A",
         EmployeeCode: "ADMIN-001"
       });
-      console.log("✅ Admin account successfully seeded.");
+      console.log(" Admin account successfully seeded.");
     } else {
-      console.log("✅ Admin already exists! Skipping creation.");
+      console.log(" Admin already exists! Skipping creation.");
     }
 
     // 3. Check for Master HR (Account Level 2)

@@ -73,6 +73,7 @@ jobs:
           key: ${{ secrets.AZURE_SSH_KEY }}
           source: "docker-compose.yml"
           target: "/opt/nyxai/employee-system/"
+          use_insecure_cipher: true
 
       - name: Execute Remote Image Swap
         uses: appleboy/ssh-action@v1.0.3
