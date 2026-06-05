@@ -1,40 +1,99 @@
-name: Production Ansible Deployment
+name: Deploy Application Stack
 
-# 1. THE TRIGGER: This runs every time you merge code into the main branch
 on:
   push:
     branches:
       - main
+    paths:
+      - 'backend/**'
+      - 'frontend/**'
+      - 'nginx/**'
+      - 'docker-compose.yml'
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
-  deploy:
-    name: Execute Ansible Playbook
+  build-and-push:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      repo_owner: ${{ steps.vars.outputs.owner_lower }}
     steps:
-      # 2. Grab the latest code from the repository
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 3. Install Ansible on the temporary GitHub cloud runner
-      - name: Install Ansible
-        run: |
-          sudo apt update
-          sudo apt install -y ansible
+      - name: Convert repo owner to lowercase for Docker compatibility
+        id: vars
+        run: echo "owner_lower=${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]' >> $GITHUB_OUTPUT
 
-      # 4. Securely inject your SSH key so Ansible can log into Azure
-      - name: Set up SSH Key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          ssh-private-key: ${{ secrets.AZURE_SSH_KEY }}
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 5. Prevent SSH fingerprint prompts from freezing the pipeline
-      - name: Add Azure VPS to Known Hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.AZURE_HOST }} >> ~/.ssh/known_hosts
+      # Build Tiers concurrently via Docker Buildx caching capabilities
+      - name: Build and Push Backend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ steps.vars.outputs.owner_lower }}/nyxai-backend:latest
 
-      # 6. Fire the playbook! 
-      - name: Run Ansible Playbook
-        working-directory: ./ansible
-        run: |
-          ansible-playbook -i hosts.ini deploy.yml -u hezron
+      - name: Build and Push Frontend Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ steps.vars.outputs.owner_lower }}/nyxai-frontend:latest
+
+      - name: Build and Push Nginx Image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./nginx
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ steps.vars.outputs.owner_lower }}/nyxai-nginx:latest
+
+  deploy-to-azure:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository to copy docker-compose file
+        uses: actions/checkout@v4
+
+      - name: Securely Sync production docker-compose file to Host
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: 4.221.166.232
+          username: hezron
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          source: "docker-compose.yml"
+          target: "/opt/nyxai/employee-system/"
+
+      - name: Execute Remote Image Swap
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 4.221.166.232
+          username: hezron
+          key: ${{ secrets.AZURE_SSH_KEY }}
+          script: |
+            cd /opt/nyxai/employee-system
+            
+            # Export registry owner context as an env variable for docker compose to parse
+            export GITHUB_REPOSITORY_OWNER_LOWER="${{ needs.build-and-push.outputs.repo_owner }}"
+            
+            # Authenticate the server with GHCR using runtime ephemeral token
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Pull only new target tiers down
+            docker compose pull backend frontend nginx
+            
+            # Seamlessly swap out live containers using detached tracking with zero database drops
+            docker compose up -d --no-deps backend frontend nginx
+            
+            # Prune dangling layers to prevent storage creep on your VPS disk
+            docker image prune -f

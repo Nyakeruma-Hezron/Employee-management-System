@@ -1,4 +1,4 @@
-
+version: '3.8'
 
 services:
   # MongoDB Database
@@ -25,48 +25,41 @@ services:
 
   # Backend Service
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWER}/nyxai-backend:latest
     container_name: employee-management-backend
-    command: npx nodemon app.js
+    # Changed to run production build instead of watching files with nodemon
+    command: node app.js 
     expose:
       - "4000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: production
       PORT: ${PORT:-4000}
       DATABASEURL: mongodb://${MONGO_USER:-admin}:${MONGO_PASSWORD:-password}@mongo:27017/${MONGO_DB:-employee_management}?authSource=admin
       JWTKEY: ${JWT_SECRET}
     depends_on:
       mongo:
         condition: service_healthy
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
+    # Removed bind mounts: code is securely baked inside the image
     networks:
       - employee-network
     restart: unless-stopped
 
   # Frontend Service
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWER}/nyxai-frontend:latest
     container_name: employee-management-frontend
     command: serve -s build -l 3000
     expose:
       - "3000"
     environment:
-      NODE_ENV: ${NODE_ENV:-development}
+      NODE_ENV: production
     networks:
       - employee-network
     restart: unless-stopped
 
   # Nginx reverse proxy and router
   nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
+    image: ghcr.io/${GITHUB_REPOSITORY_OWNER_LOWER}/nyxai-nginx:latest
     container_name: employee-management-nginx
     ports:
       - "${NGINX_PORT:-80}:80"
