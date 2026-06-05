@@ -46,9 +46,9 @@ const seedDatabase = async () => {
         Gender: "N/A",
         EmployeeCode: "HR-001"
       });
-      console.log("✅ HR account successfully seeded.");
+      console.log(" HR account successfully seeded.");
     } else {
-      console.log("✅ HR already exists! Skipping creation.");
+      console.log(" HR already exists! Skipping creation.");
     }
 
   } catch (error) {
